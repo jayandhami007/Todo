@@ -1,4 +1,3 @@
-// Selecting the required HTML elements for functionality using querySelector
 let inputBox = document.querySelector("#inputBox");
 let addButton = document.querySelector("#addButton");
 let allListItems = document.querySelector("#allListItems");
@@ -8,7 +7,6 @@ function saveData() {
   localStorage.setItem("tasks", allListItems.innerHTML);
 }
 
-// Function to load tasks from localStorage
 function loadTasks() {
   const savedData = localStorage.getItem("tasks");
   if (savedData) {
@@ -35,9 +33,9 @@ function handleDelete(event) {
 
 // Handle marking tasks as completed
 function handleCompleted(event) {
-  const buttonsDiv = event.target.closest(".buttons"); // Find the parent div containing the buttons
-  const statusText = buttonsDiv.querySelector("p"); // Select the <p> element inside the buttons
-  statusText.style.display = "block"; // Make the <p> element visible
+  const buttonsDiv = event.target.closest(".buttons"); 
+  const statusText = buttonsDiv.querySelector("p"); 
+  statusText.style.display = "block"; 
 }
 
 // Add new tasks
@@ -63,15 +61,12 @@ addButton.addEventListener("click", () => {
     .querySelector(".deleteButton")
     .addEventListener("click", handleDelete);
 
-  // Add event listener to the new completed button
   eachlistItem
     .querySelector(".completedButton")
     .addEventListener("click", handleCompleted);
 
-  // Append the new list item to the container
   allListItems.appendChild(eachlistItem);
 
-  // Clear the input field and save to localStorage
   inputBox.value = "";
   saveData();
 });
