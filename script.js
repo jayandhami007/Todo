@@ -2,40 +2,69 @@ let inputBox = document.querySelector("#inputBox");
 let addButton = document.querySelector("#addButton");
 let allListItems = document.querySelector("#allListItems");
 
-// Function to save the list data to localStorage
+// Initialize an array to store tasks
+let tasks = [];
+
+// Save tasks to localStorage
 function saveData() {
-  localStorage.setItem("tasks", allListItems.innerHTML);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
+// Load tasks from localStorage
 function loadTasks() {
   const savedData = localStorage.getItem("tasks");
   if (savedData) {
-    allListItems.innerHTML = savedData;
-
-    // Add event listeners for delete buttons on loaded items
-    document.querySelectorAll(".deleteButton").forEach((deleteButton) => {
-      deleteButton.addEventListener("click", handleDelete);
-    });
-
-    // Add event listeners for completed buttons on loaded items
-    document.querySelectorAll(".completedButton").forEach((completedButton) => {
-      completedButton.addEventListener("click", handleCompleted);
-    });
+    tasks = JSON.parse(savedData); // Parse the stored JSON string back into an array
+    renderTasks();
   }
 }
 
+// Render tasks to the DOM
+function renderTasks() {
+  allListItems.innerHTML = ""; // Clear the list before rendering
+  tasks.forEach((task) => {
+    // Create a new list item for each task
+    let eachListItem = document.createElement("div");
+    eachListItem.classList.add("eachListItems", "mb-2", "px-3", "py-1");
+    eachListItem.innerHTML = `
+        <p ${task.isCompleted ? 'style="text-decoration: line-through;"' : ""}>
+          ${task.title}
+        </p>
+        <div class="buttons">
+            <p style="display: ${task.isCompleted ? "block" : "none"};">Completed</p>
+            <button class="btn btn-outline-danger deleteButton">Remove</button>
+            <button class="btn btn-outline-success completedButton">✔</button>
+        </div>`;
+
+    // Add event listener for delete button
+    eachListItem
+      .querySelector(".deleteButton")
+      .addEventListener("click", () => handleDelete(task.id));
+
+    // Add event listener for completed button
+    eachListItem
+      .querySelector(".completedButton")
+      .addEventListener("click", () => handleCompleted(task.id));
+
+    allListItems.appendChild(eachListItem);
+  });
+}
+
 // Handle the deletion of tasks
-function handleDelete(event) {
-  const listItem = event.target.closest(".eachListItems");
-  listItem.remove();
-  saveData(); // Update localStorage after deleting
+function handleDelete(id) {
+  tasks = tasks.filter((task) => task.id !== id); // Remove the task with the matching ID
+  saveData(); // Update localStorage
+  renderTasks(); // Re-render the tasks
 }
 
 // Handle marking tasks as completed
-function handleCompleted(event) {
-  const buttonsDiv = event.target.closest(".buttons"); 
-  const statusText = buttonsDiv.querySelector("p"); 
-  statusText.style.display = "block"; 
+function handleCompleted(id) {
+  const task = tasks.find((task) => task.id === id);
+  if (task) {
+    task.isCompleted = !task.isCompleted; // Toggle the isCompleted status
+    saveData(); // Update localStorage
+    renderTasks(); // Re-render the tasks
+  }
 }
 
 // Add new tasks
@@ -45,30 +74,18 @@ addButton.addEventListener("click", () => {
     return;
   }
 
-  // Create a new list item
-  let eachlistItem = document.createElement("div");
-  eachlistItem.classList.add("eachListItems", "mb-2", "px-3", "py-1");
-  eachlistItem.innerHTML = `
-        <p>${inputBox.value}</p>
-        <div class="buttons">
-            <p>Completed</p>
-            <button class="btn btn-outline-danger deleteButton">Remove</button>
-            <button class="btn btn-outline-success completedButton">✔</button>
-        </div>`;
+  // Create a new task object
+  const newTask = {
+    id: Date.now(), // Unique ID based on timestamp
+    title: inputBox.value,
+    isCompleted: false,
+  };
 
-  // Add event listener to the new delete button
-  eachlistItem
-    .querySelector(".deleteButton")
-    .addEventListener("click", handleDelete);
+  tasks.push(newTask); // Add the new task to the array
+  saveData(); // Save the updated tasks array to localStorage
+  renderTasks(); // Re-render the tasks
 
-  eachlistItem
-    .querySelector(".completedButton")
-    .addEventListener("click", handleCompleted);
-
-  allListItems.appendChild(eachlistItem);
-
-  inputBox.value = "";
-  saveData();
+  inputBox.value = ""; // Clear the input field
 });
 
 // Load tasks from localStorage when the page loads
