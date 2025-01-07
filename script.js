@@ -10,18 +10,18 @@ function saveData() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// Load tasks from localStorage
+// Loading task from  localStorage
 function loadTasks() {
   const savedData = localStorage.getItem("tasks");
   if (savedData) {
-    tasks = JSON.parse(savedData); // Parse the stored JSON string back into an array
+    tasks = JSON.parse(savedData); 
     renderTasks();
   }
 }
 
 // Render tasks to the DOM
 function renderTasks() {
-  allListItems.innerHTML = ""; // Clear the list before rendering
+  allListItems.innerHTML = ""; 
   tasks.forEach((task) => {
     // Create a new list item for each task
     let eachListItem = document.createElement("div");
@@ -36,12 +36,10 @@ function renderTasks() {
             <button class="btn btn-outline-success completedButton">✔</button>
         </div>`;
 
-    // Add event listener for delete button
     eachListItem
       .querySelector(".deleteButton")
       .addEventListener("click", () => handleDelete(task.id));
 
-    // Add event listener for completed button
     eachListItem
       .querySelector(".completedButton")
       .addEventListener("click", () => handleCompleted(task.id));
@@ -50,20 +48,20 @@ function renderTasks() {
   });
 }
 
-// Handle the deletion of tasks
+// Function to delete tasks 
 function handleDelete(id) {
-  tasks = tasks.filter((task) => task.id !== id); // Remove the task with the matching ID
-  saveData(); // Update localStorage
-  renderTasks(); // Re-render the tasks
+  tasks = tasks.filter((task) => task.id !== id); 
+  saveData(); 
+  renderTasks(); 
 }
 
-// Handle marking tasks as completed
+// Funcion to make tasks as completed or not 
 function handleCompleted(id) {
   const task = tasks.find((task) => task.id === id);
   if (task) {
-    task.isCompleted = !task.isCompleted; // Toggle the isCompleted status
-    saveData(); // Update localStorage
-    renderTasks(); // Re-render the tasks
+    task.isCompleted = !task.isCompleted;
+    saveData();
+    renderTasks(); 
   }
 }
 
@@ -74,19 +72,18 @@ addButton.addEventListener("click", () => {
     return;
   }
 
-  // Create a new task object
   const newTask = {
-    id: Date.now(), // Unique ID based on timestamp
+    id: Date.now(), 
     title: inputBox.value,
     isCompleted: false,
   };
 
-  tasks.push(newTask); // Add the new task to the array
-  saveData(); // Save the updated tasks array to localStorage
-  renderTasks(); // Re-render the tasks
+  tasks.push(newTask); 
+  saveData(); 
+  renderTasks(); 
 
-  inputBox.value = ""; // Clear the input field
+  inputBox.value = ""; 
 });
 
-// Load tasks from localStorage when the page loads
+
 loadTasks();
